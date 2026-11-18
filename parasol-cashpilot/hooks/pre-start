@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+mkdir -p \
+  "${APP_DATA_DIR}/data/docker" \
+  "${APP_DATA_DIR}/data/fleet" \
+  "${APP_DATA_DIR}/data/ui" \
+  "${APP_DATA_DIR}/data/worker"

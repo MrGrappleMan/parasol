@@ -1,0 +1,65 @@
+version: "3.7"
+
+services:
+  app_proxy:
+    environment:
+      APP_HOST: parasol-cashpilot_cashpilot-ui_1
+      APP_PORT: 8080
+      # CashPilot has its own owner account + session auth
+      PROXY_AUTH_ADD: "false"
+
+  dind:
+    image: docker:27-dind
+    container_name: parasol-cashpilot_dind_1
+    hostname: parasol-cashpilot_dind_1
+    privileged: true
+    restart: unless-stopped
+    environment:
+      DOCKER_TLS_CERTDIR: ""
+    volumes:
+      - ${APP_DATA_DIR}/data/docker:/var/lib/docker
+
+  cashpilot-ui:
+    image: drumsergio/cashpilot:2.3
+    container_name: parasol-cashpilot_cashpilot-ui_1
+    hostname: parasol-cashpilot_cashpilot-ui_1
+    init: true
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp:size=64M
+    environment:
+      TZ: UTC
+      CASHPILOT_COLLECT_INTERVAL: "60"
+      CASHPILOT_DRIFT_WARNINGS: "true"
+      CASHPILOT_SECRET_KEY: ${APP_CASHPILOT_SECRET_KEY:-}
+      CASHPILOT_API_KEY: ${APP_CASHPILOT_API_KEY:-}
+    volumes:
+      - ${APP_DATA_DIR}/data/ui:/data
+      - ${APP_DATA_DIR}/data/fleet:/fleet
+
+  cashpilot-worker:
+    image: drumsergio/cashpilot-worker:2.3
+    container_name: parasol-cashpilot_cashpilot-worker_1
+    hostname: parasol-cashpilot_cashpilot-worker_1
+    init: true
+    restart: unless-stopped
+    depends_on:
+      - dind
+      - cashpilot-ui
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp:size=64M
+    environment:
+      TZ: UTC
+      DOCKER_HOST: tcp://parasol-cashpilot_dind_1:2375
+      CASHPILOT_UI_URL: http://parasol-cashpilot_cashpilot-ui_1:8080
+      CASHPILOT_WORKER_NAME: local
+      CASHPILOT_ISOLATION: auto
+      CASHPILOT_DRIFT_WARNINGS: "true"
+      CASHPILOT_API_KEY: ${APP_CASHPILOT_API_KEY:-}
+    volumes:
+      - ${APP_DATA_DIR}/data/worker:/data
+      - ${APP_DATA_DIR}/data/fleet:/fleet
