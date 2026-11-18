@@ -1,0 +1,32 @@
+manifestVersion: 1
+id: <store-id>-cashpilot
+category: finance
+name: CashPilot
+version: "2.3"
+tagline: Fleet manager for passive-income Docker containers
+description: >-
+  CashPilot manages and monitors passive-income Docker earner containers from
+  a single web dashboard. This package runs CashPilot inside an isolated
+  Docker-in-Docker (DinD) engine so earner containers and networks stay
+  completely separate from your Umbrel host's Docker daemon.
+
+
+  On first launch, check the cashpilot-ui container logs to retrieve the
+  one-time setup token and create your owner account at /register.
+developer: GeiserX
+website: https://geiserx.github.io/CashPilot/
+repo: https://github.com/GeiserX/CashPilot
+support: https://github.com/GeiserX/CashPilot/issues
+port: 8380
+gallery: []
+path: ""
+defaultUsername: ""
+defaultPassword: ""
+dependencies: []
+icon: https://raw.githubusercontent.com/GeiserX/CashPilot/main/docs/assets/logo.png
+submitter: MrGrappleMan
+submission: https://github.com/MrGrappleMan/parasol
+backupIgnore:
+  - data/docker
+hooks:
+  pre-start: hooks/pre-start
