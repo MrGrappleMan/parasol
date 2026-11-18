@@ -1,0 +1,27 @@
+version: "3.7"
+
+services:
+  app_proxy:
+    image: getumbrel/app-proxy:v0.1.2
+    hostname: parasol-honeygain_app_proxy_1
+    ports:
+      - "80"
+    environment:
+      - APP_HOST=honeygain
+      - APP_PORT=80
+    restart: always
+
+  honeygain:
+    image: docker.io/honeygain/honeygain:latest
+    container_name: parasol-honeygain
+    restart: always
+    labels:
+      - io.containers.autoupdate=image
+    command:
+      - -email
+      - "${HONEYGAIN_MAIL}"
+      - -pass
+      - "${HONEYGAIN_PW}"
+      - -device
+      - "${DEVICE_ID:-parasol-node}"
+      - -tou-accept
